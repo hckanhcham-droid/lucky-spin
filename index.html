@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>កងបង្វិលសំណាង - Lucky Spin Wheel</title>
+  <meta name="description" content="កម្មវិធីបង្វិលកងផ្សងសំណាងត្រូវរង្វាន់ផ្សេងៗ - Lucky Spin Wheel with customizable prizes, sound effects, and animations">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-gold">
+  <!-- Background Ambient Glows -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-area">
+        <div class="logo-icon">🎡</div>
+        <div>
+          <h1 class="logo-title" data-i18n="appTitle">កងបង្វិលសំណាង</h1>
+          <p class="logo-subtitle" data-i18n="appSubtitle">បង្វិលឈ្នះរង្វាន់អស្ចារ្យជារៀងរាល់ថ្ងៃ!</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Sound Toggle -->
+        <button id="soundToggleBtn" class="icon-btn" title="បិទ/បើកសម្លេង (Toggle Sound)" aria-label="Toggle Sound">
+          <svg id="soundIconOn" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+          <svg id="soundIconOff" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+
+        <!-- Fullscreen Button -->
+        <button id="fullscreenBtn" class="icon-btn" title="ពង្រីកពេញអេក្រង់ (Fullscreen)" aria-label="Fullscreen">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+
+        <!-- Language Selector -->
+        <button id="langToggleBtn" class="lang-btn" title="ប្តូរភាសា / Change Language">
+          <span class="lang-flag">🇰🇭</span>
+          <span id="langLabel">ខ្មែរ</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-layout">
+    <!-- Left Column: The Wheel Section -->
+    <section class="wheel-section">
+      <!-- Wheel Frame with Marquee Lights -->
+      <div class="wheel-stage">
+        <!-- Lights ring -->
+        <div class="wheel-lights-ring" id="lightsRing"></div>
+
+        <!-- The Canvas Wheel -->
+        <div class="wheel-wrapper">
+          <canvas id="wheelCanvas" width="800" height="800"></canvas>
+          
+          <!-- Center Spinner Button (Interactive) -->
+          <div class="center-hub">
+            <button id="centerSpinBtn" class="hub-spin-button" aria-label="Spin Wheel">
+              <span class="spin-text" data-i18n="spinHub">បង្វិល<br><small>SPIN</small></span>
+            </button>
+          </div>
+
+          <!-- Pointer / Ticker Arrow -->
+          <div class="ticker-pointer" id="tickerPointer">
+            <div class="pointer-arrow"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="wheel-controls">
+        <button id="mainSpinBtn" class="btn btn-primary btn-xl glow-effect">
+          <span class="btn-icon">⚡</span>
+          <span data-i18n="spinNow">បង្វិលឥឡូវនេះ (SPIN NOW)</span>
+        </button>
+
+        <div class="control-row">
+          <div class="control-group">
+            <label for="spinDurationSelect" data-i18n="spinDuration">ល្បឿនបង្វិល៖</label>
+            <select id="spinDurationSelect" class="form-select">
+              <option value="3">៣ វិនាទី (3s - លឿន)</option>
+              <option value="5" selected>៥ វិនាទី (5s - ល្មម)</option>
+              <option value="8">៨ វិនាទី (8s - រំភើប)</option>
+              <option value="12">១២ វិនាទី (12s - យឺតរំភើប)</option>
+            </select>
+          </div>
+
+          <div class="control-group switch-group">
+            <label class="switch-label">
+              <input type="checkbox" id="removeWonToggle" class="switch-input">
+              <span class="switch-slider"></span>
+              <span class="switch-text" data-i18n="removeWonOption">លុបរង្វាន់ចេញក្រោយត្រូវ</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Prizes & Winners Management Panel -->
+    <aside class="panel-section">
+      <!-- Tabs Header -->
+      <div class="panel-tabs">
+        <button class="tab-btn active" data-tab="prizesTab">
+          <span class="tab-icon">🎁</span>
+          <span data-i18n="tabPrizes">បញ្ជីរង្វាន់</span>
+          <span class="badge" id="prizeCountBadge">8</span>
+        </button>
+        <button class="tab-btn" data-tab="historyTab">
+          <span class="tab-icon">🏆</span>
+          <span data-i18n="tabHistory">ប្រវត្តិអ្នកឈ្នះ</span>
+          <span class="badge" id="historyCountBadge">0</span>
+        </button>
+      </div>
+
+      <!-- Tab Content: Prizes Management -->
+      <div class="tab-content active" id="prizesTab">
+        <!-- Preset Selector Dropdown -->
+        <div class="preset-box">
+          <label class="block-label" data-i18n="presetLabel">គំរូរង្វាន់រហ័ស (Presets):</label>
+          <div class="preset-buttons">
+            <button class="btn btn-preset active" data-preset="mega">🎁 រង្វាន់ធំ VIP</button>
+            <button class="btn btn-preset" data-preset="discount">🏷️ បញ្ចុះតម្លៃ</button>
+            <button class="btn btn-preset" data-preset="party">🍻 ជប់លៀងសប្បាយ</button>
+            <button class="btn btn-preset" data-preset="lucky">🍀 ចាប់លេខសំណាង</button>
+          </div>
+        </div>
+
+        <!-- Add Prize Form -->
+        <form id="addPrizeForm" class="add-prize-form">
+          <div class="form-title" data-i18n="addNewPrize">➕ បន្ថែមរង្វាន់ថ្មី</div>
+          <div class="form-grid">
+            <div class="input-wrap text-wrap">
+              <input type="text" id="prizeNameInput" placeholder="ឈ្មោះរង្វាន់ (ឧទាហរណ៍៖ iPhone 16)" required autocomplete="off">
+            </div>
+            <div class="input-wrap icon-wrap">
+              <input type="text" id="prizeIconInput" placeholder="Emoji (🎁)" maxlength="4" value="🎁">
+            </div>
+            <div class="input-wrap color-wrap" title="ជ្រើសរើសពណ៌កង">
+              <input type="color" id="prizeColorInput" value="#FF6B6B">
+            </div>
+            <div class="input-wrap weight-wrap" title="ឱកាសត្រូវរង្វាន់ (ទម្ងន់)">
+              <input type="number" id="prizeWeightInput" min="1" max="100" value="1" placeholder="ទម្ងន់">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success btn-block">
+            <span data-i18n="addPrizeBtn">បន្ថែមទៅក្នុងកង</span>
+          </button>
+        </form>
+
+        <!-- Prize Action Bar (Shuffle, Reset) -->
+        <div class="list-actions">
+          <span class="list-info" data-i18n="prizesListTitle">រង្វាន់ទាំងអស់លើកង៖</span>
+          <div class="action-btn-group">
+            <button id="shufflePrizesBtn" class="btn btn-sm btn-outline" title="ច្របល់លំដាប់រង្វាន់">
+              🔀 <span data-i18n="shuffle">ច្របល់</span>
+            </button>
+            <button id="resetPrizesBtn" class="btn btn-sm btn-outline" title="កំណត់ឡើងវិញ">
+              🔄 <span data-i18n="reset">ដើម</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Prize Items List -->
+        <div class="prize-list" id="prizeItemsContainer">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+
+      <!-- Tab Content: History of Winners -->
+      <div class="tab-content" id="historyTab">
+        <div class="history-header">
+          <div>
+            <h3 data-i18n="historyTitle">ប្រវត្តិបង្វិលឈ្នះរង្វាន់</h3>
+            <p class="history-sub" data-i18n="historySub">រាល់លទ្ធផលដែលបានបង្វិលកន្លងមក</p>
+          </div>
+          <div class="history-actions">
+            <button id="exportCsvBtn" class="btn btn-sm btn-outline" title="ទាញយកជា CSV">
+              📥 <span data-i18n="export">ទាញយក</span>
+            </button>
+            <button id="clearHistoryBtn" class="btn btn-sm btn-outline btn-danger" title="លុបប្រវត្តិទាំងអស់">
+              🗑️ <span data-i18n="clear">សម្អាត</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- History List Container -->
+        <div class="history-list" id="historyContainer">
+          <div class="empty-state">
+            <div class="empty-icon">🎯</div>
+            <p data-i18n="noHistory">មិនទាន់មានប្រវត្តិបង្វិលនៅឡើយទេ។<br>សូមចុចបង្វិលកងដើម្បីផ្សងសំណាង!</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Winner Modal (Popup) -->
+  <div class="modal-overlay" id="winnerModal">
+    <div class="modal-card">
+      <div class="confetti-holder">
+        <canvas id="confettiCanvas"></canvas>
+      </div>
+      <div class="winner-sparkle-bg"></div>
+      
+      <div class="winner-content">
+        <div class="winner-trophy">🎉</div>
+        <h2 class="winner-congrats" data-i18n="congrats">សូមអបអរសាទរ!</h2>
+        <p class="winner-sub" data-i18n="youWon">អ្នកបានឈ្នះរង្វាន់៖</p>
+
+        <div class="won-prize-box">
+          <span class="won-prize-icon" id="wonPrizeIcon">🎁</span>
+          <h3 class="won-prize-title" id="wonPrizeTitle">iPhone 16 Pro Max</h3>
+        </div>
+
+        <div class="winner-timestamp" id="wonPrizeTime">ម៉ោង 06:30 PM • ថ្ងៃទី 02 វិច្ឆិកា 2026</div>
+
+        <div class="modal-buttons">
+          <button id="closeModalBtn" class="btn btn-primary btn-lg">
+            <span>✨</span>
+            <span data-i18n="spinAgain">បង្វិលម្តងទៀត (SPIN AGAIN)</span>
+          </button>
+          <button id="removeThisPrizeBtn" class="btn btn-outline btn-lg">
+            <span>🗑️</span>
+            <span data-i18n="removeWonPrize">លុបរង្វាន់នេះចេញពីកង</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Prize Modal -->
+  <div class="modal-overlay" id="editPrizeModal">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <h3 data-i18n="editPrizeTitle">កែប្រែរង្វាន់</h3>
+        <button id="closeEditModalBtn" class="close-x">&times;</button>
+      </div>
+      <form id="editPrizeForm" class="edit-form">
+        <input type="hidden" id="editPrizeId">
+        <div class="form-group">
+          <label data-i18n="labelPrizeName">ឈ្មោះរង្វាន់៖</label>
+          <input type="text" id="editPrizeName" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label data-i18n="labelPrizeIcon">Emoji / រូបតំណាង៖</label>
+          <input type="text" id="editPrizeIcon" maxlength="4" class="form-input">
+        </div>
+        <div class="form-group">
+          <label data-i18n="labelPrizeColor">ពណ៌កង៖</label>
+          <input type="color" id="editPrizeColor" class="form-color">
+        </div>
+        <div class="form-group">
+          <label data-i18n="labelPrizeWeight">ទម្ងន់/ឱកាស (1 - 100)៖</label>
+          <input type="number" id="editPrizeWeight" min="1" max="100" class="form-input">
+        </div>
+        <div class="modal-buttons">
+          <button type="button" id="cancelEditBtn" class="btn btn-outline" data-i18n="cancel">បោះបង់</button>
+          <button type="submit" class="btn btn-success" data-i18n="save">រក្សាទុក</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>
+      <span>🎡 កម្មវិធីបង្វិលកងផ្សងសំណាង (Lucky Spin Wheel)</span> • 
+      <span data-i18n="footerText">រចនាឡើងជាមួយ HTML5 Canvas, Web Audio & Vercel Ready</span>
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

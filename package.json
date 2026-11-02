@@ -1,0 +1,13 @@
+{
+  "name": "lucky-wheel-kh",
+  "version": "1.0.0",
+  "description": "កម្មវិធីបង្វិលកងផ្សងសំណាងត្រូវរង្វាន់ផ្សេងៗ - Lucky Spin Wheel Khmer",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["lucky-wheel", "spin-wheel", "khmer", "game", "vercel"],
+  "author": "",
+  "license": "MIT"
+}
